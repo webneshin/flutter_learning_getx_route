@@ -1,7 +1,247 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+const authToken = "a";
 
 void main() {
   runApp(const MyApp());
+}
+
+class Routes {
+  static var defaultTransition = Transition.native;
+  static var defaultTransitionDuration = Duration(milliseconds: 150);
+
+  static const String screenA = "/screen-a";
+  static const String screenB = "/screen-b";
+  static const String screenC = "/screen-c";
+  static const String screenCDetail = "/screen-c/:id";
+  static const String login = "/login";
+  static const String screen404 = "/404";
+
+  static List<GetPage> pages = [
+    GetPage(name: '/home', page: () => ScreenA()),
+    GetPage(
+        name: Routes.screenA,
+        page: () => ScreenA(),
+        transition: Routes.defaultTransition,
+        transitionDuration: Routes.defaultTransitionDuration),
+    GetPage(
+        name: Routes.screenB,
+        page: () => ScreenB(),
+        middlewares: [
+          AuthGuard(),
+        ],
+        transition: Routes.defaultTransition,
+        transitionDuration: Routes.defaultTransitionDuration),
+    GetPage(
+        name: Routes.screenC,
+        page: () => ScreenC(),
+        transition: Routes.defaultTransition,
+        transitionDuration: Routes.defaultTransitionDuration),
+    GetPage(
+        name: Routes.screenCDetail,
+        page: () => ScreenCDetail(),
+        transition: Routes.defaultTransition,
+        transitionDuration: Routes.defaultTransitionDuration),
+    GetPage(
+        name: Routes.login,
+        page: () => ScreenLogin(),
+        transition: Routes.defaultTransition,
+        transitionDuration: Routes.defaultTransitionDuration),
+    GetPage(
+      name: Routes.screen404,
+      page: () => Screen404(),
+    )
+  ];
+}
+
+class ScreenA extends StatelessWidget {
+  static const screenTitle = "Screen A";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.red.withOpacity(0.1),
+      appBar: AppBar(
+        title: Text(screenTitle),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              screenTitle,
+            ),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(
+                      Routes.screenB,
+                    ),
+                child: const Text('B')),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenC,
+                    arguments: "test argo", parameters: {"test": "para"}),
+                child: const Text('C'))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  static const screenTitle = "Screen B";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.yellow.withOpacity(0.1),
+      appBar: AppBar(
+        title: Text(screenTitle),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              screenTitle,
+            ),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenA),
+                child: const Text('A')),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenC),
+                child: const Text('C'))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenC extends StatelessWidget {
+  static const screenTitle = "Screen C";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.blue.withOpacity(0.1),
+      appBar: AppBar(
+        title: Text(screenTitle),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              screenTitle,
+            ),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenA),
+                child: const Text('A')),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenB),
+                child: const Text('B')),
+            Text(Get.arguments ?? "Null"),
+            Text(Get.parameters.toString()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenCDetail extends StatelessWidget {
+  static const screenTitle = "Screen C Detail";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.blue.withOpacity(0.1),
+      appBar: AppBar(
+        title: Text(screenTitle),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              screenTitle,
+            ),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenA),
+                child: const Text('A')),
+            ElevatedButton(
+                onPressed: () => Get.toNamed(Routes.screenB),
+                child: const Text('B')),
+            Text(Get.arguments ?? "Null"),
+            Text(("id is:::${Get.parameters['id']!}")),
+            Text(Get.parameters.toString()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenLogin extends StatelessWidget {
+  static const screenTitle = "Screen Login";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.1),
+      appBar: AppBar(
+        title: Text(screenTitle),
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              screenTitle,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Screen404 extends StatelessWidget {
+  static const screenTitle = "404";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.1),
+      appBar: AppBar(
+        title: Text(screenTitle),
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              screenTitle,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AuthGuard extends GetMiddleware {
+  @override
+  RouteSettings? redirect(String? route) {
+    return authToken.isEmpty ? RouteSettings(name: Routes.login) : null;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -10,8 +250,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
+      unknownRoute: GetPage(name: Routes.screen404, page: () => Screen404()),
+
+      initialRoute: '/home',
+      getPages: Routes.pages,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -31,7 +275,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ScreenA(),
     );
   }
 }
@@ -58,6 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
+    Get.toNamed(Routes.screenA);
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
